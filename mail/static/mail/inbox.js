@@ -37,58 +37,68 @@ function load_mailbox(mailbox) {
   document.querySelector("#compose-view").style.display = "none";
 
   // Show the mailbox name
-  document.querySelector("#emails-view").innerHTML = `<h3>${
-    mailbox.charAt(0).toUpperCase() + mailbox.slice(1)
-  }</h3>`;
+  document.querySelector("#emails-view").innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)
+    }</h3>`;
 
   fetch(`/emails/${mailbox}`)
     .then((response) => response.json())
     .then((emails) => {
-      let listGroup = document.createElement("div");  
-      listGroup.classList.add("list-group");
-      listGroup.classList.add("list-group-flush");
 
-      document.querySelector("#emails-view").appendChild(listGroup);
 
       for (let email of emails) {
-        let row = document.createElement("div");
 
-        let listGroupItem = document.createElement("div");
-        listGroupItem.classList.add("list-group-item");
-        listGroupItem.classList.add("list-group-item-action");
+        let card = document.createElement("div");
+        card.classList.add("col-12");
+        card.classList.add("card");
+        card.setAttribute('tabindex', '0');
+
+        console.log(email.read)
+        if (email.read) {
+          card.classList.add('text-bg-light')
+        }
+        card.classList.add("mb-3");
+
+        let cardBody = document.createElement("div");
+        cardBody.classList.add("card-body");
+        cardBody.classList.add("row");
+        cardBody.classList.add("mx-0");
 
         let emailSenderCol = document.createElement("div");
-        emailSenderCol.className = "col-4";
-        emailSenderCol.classList.add("col-md-4");
-
+        emailSenderCol.classList.add("col-4");
+        
         let emailSender = document.createElement("strong");
+        emailSender.classList.add("text-truncate");
         emailSender.innerHTML = email.sender;
 
         emailSenderCol.appendChild(emailSender);
 
         let emailSubjectCol = document.createElement("div");
-        emailSubjectCol.className = "col-5";
-        emailSubjectCol.classList.add("col-md-5");
+        emailSubjectCol.classList.add("col-4");
 
         let emailSubject = document.createElement("span");
+        emailSubject.classList.add("text-truncate");
         emailSubject.innerHTML = email.subject;
-
+        
         emailSubjectCol.appendChild(emailSubject);
 
         let emailDateCol = document.createElement("div");
-        emailDateCol.className = "col-3";
-        emailDateCol.classList.add("col-md-3");
-
+        emailDateCol.classList.add("col-4");
+        emailDateCol.classList.add("d-flex");
+        emailDateCol.classList.add("justify-content-end");
+        
         let emailDate = document.createElement("span");
+        emailDate.classList.add("text-truncate");
         emailDate.innerHTML = email.timestamp;
 
         emailDateCol.appendChild(emailDate);
 
-        listGroupItem.appendChild(emailSenderCol);
-        listGroupItem.appendChild(emailSubjectCol);
-        listGroupItem.appendChild(emailDateCol);
+        cardBody.appendChild(emailSenderCol)
+        cardBody.appendChild(emailSubjectCol)
+        cardBody.appendChild(emailDateCol)
 
-        listGroup.appendChild(listGroupItem);
+        card.appendChild(cardBody);
+
+        document.querySelector("#emails-view").appendChild(card);
       }
     });
 
