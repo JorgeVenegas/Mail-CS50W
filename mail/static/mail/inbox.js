@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function compose_email() {
   // Show compose view and hide other views
   document.querySelector("#emails-view").style.display = "none";
+  document.querySelector("#email-view").style.display = "none";
   document.querySelector("#compose-view").style.display = "block";
 
   // Clear out composition fields
@@ -31,10 +32,74 @@ function compose_email() {
   document.querySelector("#compose-body").value = "";
 }
 
+function load_email() {
+  document.querySelector("#emails-view").style.display = "none";
+  document.querySelector("#email-view").style.display = "block";
+  document.querySelector("#compose-view").style.display = "none";
+
+  let replyButton = document.createElement('button')
+  replyButton.classList.add('btn', 'btn-sm', 'btn-outline-primary')
+  replyButton.setAttribute('id', 'reply')
+  document.querySelector('#replyButton').appendChild(replyButton);
+  
+  let archiveButton = document.createElement('button')
+  archiveButton.classList.add('btn', 'btn-sm', 'btn-outline-primary')
+  archiveButton.setAttribute('id', 'archieve')
+  document.querySelector('#archiveButton').appendChild(archiveButton);
+
+  fetch(`/emails/${this.id}`).then(
+    response => response.json()
+  ).then(
+    emailInfo => {
+      if (!emailInfo.read) {
+        fetch(`/emails/${this.id}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            read: true
+          })
+        })
+      }
+
+      document.querySelector("#sender").innerHTML = emailInfo.sender;
+      document.querySelector("#recipients").innerHTML = emailInfo.recipients;
+      document.querySelector("#subject").innerHTML = emailInfo.subject;
+      document.querySelector("#timestamp").innerHTML = emailInfo.timestamp;
+      document.querySelector("#mail-body").innerHTML = emailInfo.body;
+
+      let archieveBtn = document.querySelector("#archieve");
+      archieveBtn.innerHTML = emailInfo.archived ? "Unarchive" : "Archive";
+
+      let id = this.id;
+
+      function handle_archieve() {
+
+      }
+
+      if (!archieveBtn.classList.contains('archieve-handler')) {
+        archieveBtn.classList.add('archieve-handler')
+        archieveBtn.addEventListener('click', () => {
+          fetch(`/emails/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+              archived: !emailInfo.archived
+            })
+          }).then(() => {
+            let status = !emailInfo.archived ? "archived" : "unarchived";
+            load_mailbox("inbox")(`Email ${status} succesfully.`)
+          })
+        })
+      }
+
+    }
+  )
+}
+
 function load_mailbox(mailbox) {
   // Show the mailbox and hide other views
   document.querySelector("#emails-view").style.display = "block";
   document.querySelector("#compose-view").style.display = "none";
+  document.querySelector("#email-view").style.display = "none";
+
 
   // Show the mailbox name
   document.querySelector("#emails-view").innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)
@@ -44,19 +109,20 @@ function load_mailbox(mailbox) {
     .then((response) => response.json())
     .then((emails) => {
 
-
       for (let email of emails) {
 
+        // Create email card for each email.
         let card = document.createElement("div");
         card.classList.add("col-12");
         card.classList.add("card");
+        card.classList.add("border-light");
+        card.classList.add("mb-3");
         card.setAttribute('tabindex', '0');
+        card.setAttribute('id', `${email.id}`);
 
-        console.log(email.read)
         if (email.read) {
           card.classList.add('text-bg-light')
         }
-        card.classList.add("mb-3");
 
         let cardBody = document.createElement("div");
         cardBody.classList.add("card-body");
@@ -65,7 +131,7 @@ function load_mailbox(mailbox) {
 
         let emailSenderCol = document.createElement("div");
         emailSenderCol.classList.add("col-4");
-        
+
         let emailSender = document.createElement("strong");
         emailSender.classList.add("text-truncate");
         emailSender.innerHTML = email.sender;
@@ -78,14 +144,14 @@ function load_mailbox(mailbox) {
         let emailSubject = document.createElement("span");
         emailSubject.classList.add("text-truncate");
         emailSubject.innerHTML = email.subject;
-        
+
         emailSubjectCol.appendChild(emailSubject);
 
         let emailDateCol = document.createElement("div");
         emailDateCol.classList.add("col-4");
         emailDateCol.classList.add("d-flex");
         emailDateCol.classList.add("justify-content-end");
-        
+
         let emailDate = document.createElement("span");
         emailDate.classList.add("text-truncate");
         emailDate.innerHTML = email.timestamp;
@@ -98,10 +164,13 @@ function load_mailbox(mailbox) {
 
         card.appendChild(cardBody);
 
+        card.addEventListener('click', load_email)
+
         document.querySelector("#emails-view").appendChild(card);
       }
     });
 
+  // Curried function to send message on mailbox loading
   return function load_message(message) {
     let alert = document.createElement("div");
     alert.className = "alert";

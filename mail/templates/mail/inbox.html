@@ -12,13 +12,13 @@
 <hr>
 
 <div id="emails-view">
-
+    
 </div>
 
 <div id="compose-view">
-
+    
     <h3>New Email</h3>
-
+    
     <form id="compose-form">
         <div class="mb-3">
             From: <input disabled class="form-control" value="{{ request.user.email }}">
@@ -35,8 +35,30 @@
         <div id="email-sent-alert" class="alert" role="alert" style="display: none;"></div>
         <input type="submit" class="btn btn-primary" />
     </form>
-
+    
 </div>
+
+<div id="email-view">
+    <div>
+        <strong>From: </strong><span id="sender"></span>
+    </div>
+    <div>
+        <strong>To: </strong><span id="recipients"></span>
+    </div>
+    <div>
+        <strong>Subject: </strong><span id="subject"></span>
+    </div>
+    <div>
+        <strong>Timestamp: </strong><span id="timestamp"></span>
+    </div>
+    <div id="replyButton"></div>
+    <div id="archiveButton"></div>
+    <hr>
+    <div id="mail-body">
+
+    </div>
+</div>
+
 {% endblock %}
 
 {% block script %}
