@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block body %}
-<h2>{{ request.user.email }}</h2>
+<h2 id="userEmail">{{ request.user.email }}</h2>
 
 <button class="btn btn-sm btn-outline-primary" id="inbox">Inbox</button>
 <button class="btn btn-sm btn-outline-primary" id="compose">Compose</button>
@@ -12,13 +12,13 @@
 <hr>
 
 <div id="emails-view">
-    
+
 </div>
 
 <div id="compose-view">
-    
+
     <h3>New Email</h3>
-    
+
     <form id="compose-form">
         <div class="mb-3">
             From: <input disabled class="form-control" value="{{ request.user.email }}">
@@ -30,12 +30,12 @@
             <input class="form-control" id="compose-subject" placeholder="Subject">
         </div>
         <div class="mb-3">
-            <textarea class="form-control" id="compose-body" placeholder="Body"></textarea>
+            <textarea class="form-control" id="compose-body" placeholder="Body" rows="10"></textarea>
         </div>
         <div id="email-sent-alert" class="alert" role="alert" style="display: none;"></div>
         <input type="submit" class="btn btn-primary" />
     </form>
-    
+
 </div>
 
 <div id="email-view">
@@ -51,8 +51,8 @@
     <div>
         <strong>Timestamp: </strong><span id="timestamp"></span>
     </div>
-    <div id="replyButton"></div>
-    <div id="archiveButton"></div>
+    <span id="replyButton"></span>
+    <span id="archiveButton"></span>
     <hr>
     <div id="mail-body">
 
